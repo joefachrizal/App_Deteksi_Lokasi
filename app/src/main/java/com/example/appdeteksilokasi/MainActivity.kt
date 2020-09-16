@@ -5,19 +5,21 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.appdeteksilokasi.databinding.ActivityMainBinding
+import com.google.android.gms.location.LocationServices
 
 class MainActivity : AppCompatActivity() {
+
     companion object {
-        const val ID_LOCATION_PERMISSION = 0
+        const val LOCATION_PERMISSION = 0
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -30,12 +32,11 @@ class MainActivity : AppCompatActivity() {
         onClick()
     }
 
-
     private fun onClick() {
         binding.fabCheckIn.setOnClickListener {
             startScanLocation()
             Handler(Looper.getMainLooper()).postDelayed({
-                stopScanLocation()
+                getLocationCoordinat()
             }, 4000)
         }
     }
@@ -55,21 +56,43 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun getLocationCoordinat() {
+        if (checkPermission()) {
+            if (isLoactionEnable()) {
+                LocationServices.getFusedLocationProviderClient(this).lastLocation.addOnSuccessListener { location ->
+                    val currentLat = location.latitude
+                    val currentLong = location.longitude
+
+                    val resultCoordinate = "lat : $currentLat, lot : $currentLong"
+
+                    with(binding) {
+                        tvCheckInSuccess.visibility = View.VISIBLE
+                        tvCheckInSuccess.text = resultCoordinate
+                    }
+
+                    stopScanLocation()
+                }
+            } else {
+                showTurnOnLocation()
+            }
+        } else {
+            reqPermission()
+        }
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == ID_LOCATION_PERMISSION) {
+        if (requestCode == LOCATION_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED ||
                 grantResults[1] == PackageManager.PERMISSION_GRANTED
             ) {
                 Toast.makeText(this, "Akses diizinkan", Toast.LENGTH_SHORT).show()
                 if (!isLoactionEnable()) {
-                    Toast.makeText(this, "Silahakan Aktifkan Lokasi Kamu", Toast.LENGTH_SHORT)
-                        .show()
-                    startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                    showTurnOnLocation()
                 }
             } else {
                 Toast.makeText(this, "Akses Tidak diizinkan", Toast.LENGTH_SHORT).show()
@@ -80,8 +103,7 @@ class MainActivity : AppCompatActivity() {
     private fun checkPermissionLocation() {
         if (checkPermission()) {
             if (!isLoactionEnable()) {
-                Toast.makeText(this, "Silahakan Aktifkan Lokasi Kamu", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                showTurnOnLocation()
             }
         } else {
             reqPermission()
@@ -120,8 +142,13 @@ class MainActivity : AppCompatActivity() {
             arrayOf(
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ), ID_LOCATION_PERMISSION
+            ), LOCATION_PERMISSION
         )
+    }
+
+    private fun showTurnOnLocation() {
+        Toast.makeText(this, "Silahakan Aktifkan Lokasi Kamu", Toast.LENGTH_SHORT).show()
+        startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
     }
 
 
