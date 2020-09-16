@@ -6,7 +6,6 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import com.example.appdeteksilokasi.databinding.ActivityMainBinding
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -19,7 +18,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onClick() {
-        fabCheckIn.setOnClickListener {
+        binding.fabCheckIn.setOnClickListener {
             startScanLocation()
             Handler(Looper.getMainLooper()).postDelayed({
                 stopScanLocation()
@@ -28,14 +27,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startScanLocation() {
-        rippleBackground.startRippleAnimation()
-        tvScanning.visibility = View.VISIBLE
-        tvCheckInSuccess.visibility = View.GONE
+        with(binding) {
+            rippleBackground.startRippleAnimation()
+            tvScanning.visibility = View.VISIBLE
+            tvCheckInSuccess.visibility = View.GONE
+        }
     }
 
     private fun stopScanLocation() {
-        rippleBackground.stopRippleAnimation()
-        tvScanning.visibility = View.GONE
+        with(binding) {
+            rippleBackground.stopRippleAnimation()
+            tvScanning.visibility = View.GONE
+        }
     }
 
 }
