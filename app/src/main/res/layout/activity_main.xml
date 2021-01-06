@@ -60,4 +60,21 @@
         android:textSize="16sp"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/tvDaerah"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tvCheckInSuccess"
+        android:layout_below="@+id/fabCheckIn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:paddingStart="68dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="68dp"
+        android:paddingBottom="14dp"
+        android:text="@string/location_success"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:visibility="visible" />
+
 </com.skyfishjy.library.RippleBackground>
